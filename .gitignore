@@ -1,1 +1,6 @@
 __pycache__/
+
+frontend/elm-stuff/
+
+# This is compiled by elm
+frontend/index.html
