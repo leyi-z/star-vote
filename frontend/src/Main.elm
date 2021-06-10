@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, text, input, form)
 import Html.Events exposing (onClick, onSubmit, onInput)
 import Html.Attributes exposing (style, href, placeholder, action, autofocus)
 import Url exposing (Url)
-import Url.Parser
+import Url.Parser exposing ((</>))
 import Browser.Navigation as Nav
 
 
@@ -54,6 +54,12 @@ init _ url key =
     , roomID = Nothing
     }
   , Cmd.none)
+
+-- parse room ID from URL
+parseRoomID : Url -> Maybe Int
+parseRoomID = Url.Parser.parse <|
+  Url.Parser.s "room" </> Url.Parser.int
+
 
 
 -- Subs
@@ -146,6 +152,18 @@ debugInfo model =
       case model.username of
         Just s -> s
         Nothing -> "NO USERNAME YET"
+    ]
+  , div [] 
+    [ text <| "Room ID parsed out of URL: " ++ 
+      case (parseRoomID model.url) of
+        Just id -> String.fromInt id
+        Nothing -> "NONE"
+    ]
+  , div [] 
+    [ text <| "What is actually believed to be current Room ID: " ++ 
+      case model.roomID of
+        Just id -> String.fromInt id
+        Nothing -> "NONE"
     ]
   ]
 
