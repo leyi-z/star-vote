@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (UrlRequest)
 import Html exposing (Html, button, div, text, input, form)
-import Html.Events exposing (onClick, onSubmit)
+import Html.Events exposing (onClick, onSubmit, onInput)
 import Html.Attributes exposing (style, href, placeholder, action, autofocus)
 import Url exposing (Url)
 import Browser.Navigation as Nav
@@ -35,22 +35,22 @@ type Role = Host | Guest
 type alias Model = 
   { url : Url
   , key : Nav.Key
-  , numState : Int
   , status : RoomStatus
   , role : Role
   , username : Maybe String
+  , lobbyUsernameInput : String
   }
 
 
 init : () -> Url -> Nav.Key -> (Model, Cmd Msg)
 init _ url key =
   (
-    { numState = 0
-      , url = url
-      , key = key
-      , role = Host
-      , status = Lobby
-      , username = Nothing
+    { url = url
+    , key = key
+    , role = Host
+    , status = Lobby
+    , username = Nothing
+    , lobbyUsernameInput = ""
     }
   , Cmd.none)
 
@@ -64,28 +64,32 @@ subscriptions _ = Sub.none
 -- Url stuff
 
 onUrlRequest : UrlRequest -> Msg
-onUrlRequest _ = Increment
+onUrlRequest _ = EmptyMsg
 
 onUrlChange : Url -> Msg
-onUrlChange _ = Increment
+onUrlChange _ = EmptyMsg
 
 
 -- UPDATE
 
 
-type Msg
-  = Increment
-  | Decrement
+type Msg =
+  LobbyUsernameUpdate String
+  | LobbyUsernameSubmit
+  | EmptyMsg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Increment ->
-      ( { model | numState = model.numState + 1 }, Cmd.none)
+    EmptyMsg ->
+      ( model , Cmd.none)
 
-    Decrement ->
-      ({ model | numState = model.numState - 1 }, Cmd.none)
+    LobbyUsernameUpdate s ->
+      ({ model | lobbyUsernameInput = s }, Cmd.none)
+    
+    LobbyUsernameSubmit ->
+      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none)
 
 
 
@@ -114,20 +118,35 @@ viewLobby model =
             Guest -> "you are about to join a room"
         )
       ]
-    , form (verticalPaddingStyle++[onSubmit Increment])
+    , form (verticalPaddingStyle++[onSubmit LobbyUsernameSubmit])
       [
         input 
-          [ placeholder "choose a username", autofocus True ]
+          [ placeholder "choose a username", autofocus True, onInput LobbyUsernameUpdate ]
           []
       , button
           (buttonStyle)
           [ text "go" ]
       ]
+    , debugInfo model
     ]
 
 viewRoom : Model -> Int -> Html Msg
 viewRoom model id =
   text <| "We are now in a room, but this part is not yet implemented. Room ID: " ++ (String.fromInt id)
+
+
+debugInfo : Model -> Html Msg
+debugInfo model =
+  div verticalPaddingStyle
+  [
+    div [] [ text <| "Typed text: " ++ model.lobbyUsernameInput]
+  , div [] 
+    [ text <| "Username: " ++ 
+      case model.username of
+        Just s -> s
+        Nothing -> "NO USERNAME YET"
+    ]
+  ]
 
 -- Styles
 
