@@ -5,6 +5,7 @@ import Html exposing (Html, button, div, text, input, form)
 import Html.Events exposing (onClick, onSubmit, onInput)
 import Html.Attributes exposing (style, href, placeholder, action, autofocus)
 import Url exposing (Url)
+import Url.Parser
 import Browser.Navigation as Nav
 
 
@@ -25,9 +26,7 @@ main =
 
 -- MODEL
 
-type RoomStatus =
-  Lobby
-  | Room Int
+type PageState = Lobby | Room
 
 type Role = Host | Guest
 
@@ -35,10 +34,11 @@ type Role = Host | Guest
 type alias Model = 
   { url : Url
   , key : Nav.Key
-  , status : RoomStatus
+  , status : PageState
   , role : Role
-  , username : Maybe String
-  , lobbyUsernameInput : String
+  , username : Maybe String -- the actual accepted username
+  , lobbyUsernameInput : String -- contents of the username input text box
+  , roomID : Maybe Int
   }
 
 
@@ -51,6 +51,7 @@ init _ url key =
     , status = Lobby
     , username = Nothing
     , lobbyUsernameInput = ""
+    , roomID = Nothing
     }
   , Cmd.none)
 
@@ -89,7 +90,7 @@ update msg model =
       ({ model | lobbyUsernameInput = s }, Cmd.none)
     
     LobbyUsernameSubmit ->
-      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none)
+      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none) -- here we actually need to be talking to backend
 
 
 
@@ -103,7 +104,7 @@ view model =
       [
         case model.status of
           Lobby -> viewLobby model
-          Room id -> viewRoom model id
+          Room -> viewRoom model
       ]
   }
 
@@ -130,9 +131,9 @@ viewLobby model =
     , debugInfo model
     ]
 
-viewRoom : Model -> Int -> Html Msg
-viewRoom model id =
-  text <| "We are now in a room, but this part is not yet implemented. Room ID: " ++ (String.fromInt id)
+viewRoom : Model -> Html Msg
+viewRoom model =
+  text <| "We are now in a room, but this part is not yet implemented."
 
 
 debugInfo : Model -> Html Msg
