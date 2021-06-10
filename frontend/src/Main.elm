@@ -60,7 +60,7 @@ init _ url key =
 -- parse room ID from URL
 parseRoomID : Url -> Maybe Int
 parseRoomID = Url.Parser.parse <|
-  Url.Parser.s "room" </> Url.Parser.int
+  Url.Parser.s "rooms" </> Url.Parser.int
 
 
 
@@ -98,7 +98,7 @@ update msg model =
       ({ model | lobbyUsernameInput = s }, Cmd.none)
     
     LobbyUsernameSubmit ->
-      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none) -- here we actually need to be talking to backend
+      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none) -- here we actually need to validate with backend
 
 
 
