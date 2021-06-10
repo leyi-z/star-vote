@@ -3,7 +3,7 @@ module Main exposing (..)
 import Browser exposing (UrlRequest)
 import Html exposing (Html, button, div, text, input, form)
 import Html.Events exposing (onClick, onSubmit)
-import Html.Attributes exposing (style, href, placeholder, action)
+import Html.Attributes exposing (style, href, placeholder, action, autofocus)
 import Url exposing (Url)
 import Browser.Navigation as Nav
 
@@ -117,7 +117,7 @@ viewLobby model =
     , form (verticalPaddingStyle++[onSubmit Increment])
       [
         input 
-          [ placeholder "choose a username" ]
+          [ placeholder "choose a username", autofocus True ]
           []
       , button
           (buttonStyle)
