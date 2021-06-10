@@ -110,17 +110,17 @@ viewLobby model =
       [
         text (
           case model.role of
-            Host -> "you are about to create a room" ++ (String.fromInt model.numState)
+            Host -> "you are about to create a room"
             Guest -> "you are about to join a room"
         )
       ]
-    , form verticalPaddingStyle
+    , form (verticalPaddingStyle++[onSubmit Increment])
       [
         input 
-          [ placeholder "choose a username", onSubmit Increment ]
+          [ placeholder "choose a username" ]
           []
       , button
-          (buttonStyle++[onClick Increment])
+          (buttonStyle)
           [ text "go" ]
       ]
     ]
