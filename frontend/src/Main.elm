@@ -47,7 +47,9 @@ init _ url key =
   (
     { url = url
     , key = key
-    , role = Host
+    , role = case parseRoomID url of
+        Nothing -> Host
+        Just _ -> Guest
     , status = Lobby
     , username = Nothing
     , lobbyUsernameInput = ""
@@ -164,6 +166,12 @@ debugInfo model =
       case model.roomID of
         Just id -> String.fromInt id
         Nothing -> "NONE"
+    ]
+    , div [] 
+    [ text <| "User role: " ++ 
+      case model.role of
+        Host -> "host"
+        Guest -> "guest"
     ]
   ]
 
