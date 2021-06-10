@@ -1,16 +1,9 @@
 module Main exposing (..)
 
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
-
-
 import Browser exposing (UrlRequest)
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-import Html.Attributes exposing (style, href)
+import Html exposing (Html, button, div, text, input, form)
+import Html.Events exposing (onClick, onSubmit)
+import Html.Attributes exposing (style, href, placeholder, action)
 import Url exposing (Url)
 import Browser.Navigation as Nav
 
@@ -32,11 +25,20 @@ main =
 
 -- MODEL
 
+type RoomStatus =
+  Lobby
+  | Room Int
+
+type Role = Host | Guest
+
 
 type alias Model = 
-  { numState : Int
-  , url : Url
+  { url : Url
   , key : Nav.Key
+  , numState : Int
+  , status : RoomStatus
+  , role : Role
+  , username : Maybe String
   }
 
 
@@ -46,6 +48,9 @@ init _ url key =
     { numState = 0
       , url = url
       , key = key
+      , role = Host
+      , status = Lobby
+      , username = Nothing
     }
   , Cmd.none)
 
@@ -89,24 +94,40 @@ update msg model =
 
 view : Model -> Browser.Document Msg
 view model =
-  { title = "thitle"
+  { title = "Star Voter"
   , body = 
       [
-        div centralStyle
-        [ div []
-          [ button [ onClick Decrement ] [ text "-" ]
-          , div [] [ text (String.fromInt model.numState) ]
-          , button [ onClick Increment ] [ text "+" ]
-          ]
-        , div []
-          [
-            text model.url.path
-          ]
-        , div []
-          [ Html.a [href "https://www.example.com"] [ text "a link" ] ]
-        ]
+        case model.status of
+          Lobby -> viewLobby model
+          Room id -> viewRoom model id
       ]
   }
+
+viewLobby : Model -> Html Msg
+viewLobby model = 
+  div centralStyle
+    [ div verticalPaddingStyle
+      [
+        text (
+          case model.role of
+            Host -> "you are about to create a room" ++ (String.fromInt model.numState)
+            Guest -> "you are about to join a room"
+        )
+      ]
+    , form verticalPaddingStyle
+      [
+        input 
+          [ placeholder "choose a username", onSubmit Increment ]
+          []
+      , button
+          (buttonStyle++[onClick Increment])
+          [ text "go" ]
+      ]
+    ]
+
+viewRoom : Model -> Int -> Html Msg
+viewRoom model id =
+  text <| "We are now in a room, but this part is not yet implemented. Room ID: " ++ (String.fromInt id)
 
 -- Styles
 
@@ -121,4 +142,16 @@ centralStyle =
   , style "padding-right" "10%"
   , style "padding-top" "40vh"
   , style "height" "60vh"
+  ]
+
+verticalPaddingStyle =
+  [  style "padding-top" "20pt"
+  ,  style "padding-bottom" "20pt"
+  ]
+
+buttonStyle =
+  [  style "margin-top" "10pt"
+  ,  style "margin-bottom" "10pt"
+  ,  style "margin-left" "10pt"
+  ,  style "margin-right" "10pt"
   ]
