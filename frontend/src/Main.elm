@@ -47,7 +47,9 @@ init _ url key =
   (
     { url = url
     , key = key
-    , role = Host
+    , role = case parseRoomID url of
+        Nothing -> Host
+        Just _ -> Guest
     , status = Lobby
     , username = Nothing
     , lobbyUsernameInput = ""
@@ -58,7 +60,7 @@ init _ url key =
 -- parse room ID from URL
 parseRoomID : Url -> Maybe Int
 parseRoomID = Url.Parser.parse <|
-  Url.Parser.s "room" </> Url.Parser.int
+  Url.Parser.s "rooms" </> Url.Parser.int
 
 
 
@@ -96,7 +98,7 @@ update msg model =
       ({ model | lobbyUsernameInput = s }, Cmd.none)
     
     LobbyUsernameSubmit ->
-      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none) -- here we actually need to be talking to backend
+      ({ model | username = Just model.lobbyUsernameInput }, Cmd.none) -- here we actually need to validate with backend
 
 
 
@@ -164,6 +166,12 @@ debugInfo model =
       case model.roomID of
         Just id -> String.fromInt id
         Nothing -> "NONE"
+    ]
+    , div [] 
+    [ text <| "User role: " ++ 
+      case model.role of
+        Host -> "host"
+        Guest -> "guest"
     ]
   ]
 
