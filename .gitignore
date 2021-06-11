@@ -1,6 +1,16 @@
+# system files
 __pycache__/
+**/.DS_Store
 
+
+
+# e
 frontend/elm-stuff/
-
 # This is compiled by elm
 frontend/index.html
+
+
+
+# l
+venv/
+
